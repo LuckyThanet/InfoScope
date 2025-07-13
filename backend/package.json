@@ -17,7 +17,8 @@
     "express": "^4.21.1",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "whois": "^2.15.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from "express";
 import database from "./database/database";
 import cors from 'cors';
 import hello from "./routes/hello";
+// import whois from "./routes/whois";
 
 const app:Express = express();
 const PORT = process.env.PORT || 3000;
@@ -18,8 +19,11 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/', hello);
 // Routes
+
+app.get('/whois', hello);
+
 app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'Hello World!' });
+  res.json({ message: 'first ("/")' });
 });
 
 
