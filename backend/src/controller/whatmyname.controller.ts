@@ -19,8 +19,8 @@ const siteList = sitesObject.sites;
 
 export const getWmn = async (req: Request, res: Response) => {
 
-    const account = req.params.account;
-    // const account = req.body.account;
+    // const account = req.params.account;
+    const account = req.body.account;
     const found: string[] = [];
 
     const checks = siteList.map(async (site: any) => {

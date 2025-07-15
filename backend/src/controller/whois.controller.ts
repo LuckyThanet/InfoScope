@@ -10,8 +10,8 @@ const dnsLookup = util.promisify(dns.lookup);
 export const getWhoisInfo = async (req: Request, res: Response) => {
   try {
     // ดึงชื่อโดเมนจาก URL parameter เช่น /api/whois/google.com
-    // const domain = req.body.domain;
-    const domain = req.params.domain;
+    const domain = req.body.domain;
+    // const domain = req.params.domain;
 
     console.log(domain);
 

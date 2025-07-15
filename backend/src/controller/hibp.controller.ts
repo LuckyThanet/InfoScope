@@ -3,14 +3,14 @@ import { Request, Response } from 'express';
 import sha1 from 'crypto-js/sha1';
 
 export const checkPasswordHibp = async (req: Request, res: Response) => {
-//   const password = req.body.password;
-  const password = req.params.password;
+  const hash = req.body.hash;
+  // const password = req.params.password;
 
-  if (!password) {
+  if (!hash) {
     return res.status(400).json({ error: 'Missing password in body' });
   }
 
-  const hash = sha1(password).toString().toUpperCase();
+  // const hash = sha1(password).toString().toUpperCase();
   const prefix = hash.slice(0, 5);
   const suffix = hash.slice(5);
 

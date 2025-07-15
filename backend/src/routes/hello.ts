@@ -9,10 +9,10 @@ const router = Router();
 
 router.get("/hello", getHello);
 
-router.get("/whois/:domain", getWhoisInfo);
+router.post("/whois", getWhoisInfo);
 
-router.get("/wmn/:account", getWmn);
+router.post("/wmn", getWmn);
 
-router.get("/hibp/:password", checkPasswordHibp);
+router.post("/hibp", checkPasswordHibp);
 
 export default router;

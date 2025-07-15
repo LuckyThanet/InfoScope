@@ -86,11 +86,11 @@ const email = 'charuwan_arkat@hotmail.com';
 app.use('/api/', hello);
 // Routes
 
-app.get('/whois', hello);
+app.post('/whois', hello);
 
-app.get('/wmn', hello);
+app.post('/wmn', hello);
 
-app.get('/hipn', hello);
+app.post('/hipn', hello);
 
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'first ("/")' });
