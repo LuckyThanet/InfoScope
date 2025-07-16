@@ -26,7 +26,10 @@ const dnsLookup = util.promisify(dns.lookup);
 export const getWhoisInfo = async (req: Request, res: Response): Promise<Response<WhoisResponse>> => {
   try {
     // ดึงชื่อโดเมนจาก URL parameter เช่น /api/whois/google.com
-    const domain: string = req.params.domain;
+    const domain = req.body.domain;
+    // const domain = req.params.domain;
+
+    console.log(domain);
 
     if (!domain) {
       return res.status(400).json({ 
@@ -47,7 +50,6 @@ export const getWhoisInfo = async (req: Request, res: Response): Promise<Respons
       data: result,
     });
 
-    console.log(tmp);
     return res.status(200).json({
       success: true,
       ip: dnsResult.address,

@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import NotFound from "../src/pages/PageNotFound";
+import TestPage from "../src/pages/testApiPage";
 
 
 const router = createBrowserRouter(
@@ -13,9 +14,16 @@ const router = createBrowserRouter(
                 }
             ]
         },
+        {
+            path: "/testPage",
+            element: <TestPage />,
+            errorElement: "",
+        },
     ]
 )
 
 export const AppRoutes = () => {
-    return <RouterProvider router={router} />;
+    return (
+        <RouterProvider router={router} />
+    );
 };
