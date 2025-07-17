@@ -16,6 +16,10 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.DATE,
         allowNull: false,
       },
+      case_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      }
     },
     {
       tableName: 'case',

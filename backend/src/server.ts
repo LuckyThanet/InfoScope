@@ -38,11 +38,11 @@ app.use('*', (req: Request, res: Response) => {
 
 const startServer = async () => {
   try {
-    // await database.sequelize.authenticate();
-    // await database.sequelize.sync({ force: false }); 
-    // await db.sequelize.sync(); 
+    await database.sequelize.authenticate();
+    await database.sequelize.sync({ force: true }); 
+    await database.sequelize.sync(); 
 
-    // console.log('Connection has been established successfully.');
+    console.log('Connection has been established successfully.');
 
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

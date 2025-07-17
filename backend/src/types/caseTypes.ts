@@ -1,6 +1,7 @@
 export interface CaseAttributes {
   case_id: number;
   startDate: Date;
+  case_name: string;
   created_at?: Date;
   updated_at?: Date;
 }
