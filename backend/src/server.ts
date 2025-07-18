@@ -27,11 +27,11 @@ app.post('/hipn', hello);
 
 app.get('/insert', hello);
 
-app.get('/history', hello);
+app.post('/history', hello);
 
 app.get('/result', hello);
 
-app.get('/delete', hello);
+app.delete('/delete', hello);
 
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'first ("/")' });

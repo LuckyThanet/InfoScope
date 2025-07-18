@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import db from '../database/database';
+import { Op, where } from "sequelize";
 import { CaseAttributes } from "../types/caseTypes";
 
 interface CaseWithIncludes {
@@ -17,42 +18,68 @@ interface CaseWithIncludes {
     }[];
 }
 
-export const getHistory = async (_req: Request, res: Response) => {
+export const getHistory = async (req: Request, res: Response) => {
 
     // const body = _req.body;
+    const rowPerPage = parseInt(req.body.rowPerPage as string) || 10;
+    const page = parseInt(req.body.page as string) || 1;
+    const searchName = req.body.searchName;
 
     try {
-        const allCase = await db.Case.findAll({
+
+        const whereCondition: any = {};
+        if (searchName) {
+            whereCondition.case_name = {
+                [Op.like]: `%${searchName}%` // ค้นหา case_name ที่มีคำว่า search อยู่
+            };
+        }
+
+        const count = await db.Case.count({
+            where: whereCondition,
+            include: [{
+                model: db.Indicator,
+                as: 'indicators',
+                // ใส่ attributes: [] เพื่อไม่ให้กระทบการนับ แต่ยังคง JOIN ได้
+                attributes: [] 
+            }],
+            distinct: true,
+            // ระบุ col ที่จะนับ distinct ให้ชัดเจน (แนะนำ)
+            col: 'case_id'
+        });
+
+        
+        const allCases = await db.Case.findAll({
+            where: whereCondition,
             attributes: ['case_id', 'case_name', 'created_at'],
             include: [
                 {
-                model: db.Indicator,
-                as: 'indicators',
-                // ไม่ต้องการฟิลด์จาก Indicator เลย ให้ระบุเป็น array ว่าง
-                attributes: ['indicator_id'], 
-                include: [
-                    {
-                    model: db.Result,
-                    as: 'results',
-                    // ไม่ต้องการฟิลด์จาก Result เลย
-                    attributes: ['result_id'],
+                    model: db.Indicator,
+                    as: 'indicators',
+                    attributes: ['indicator_id'],
                     include: [
                         {
-                        model: db.Tool,
-                        as: 'toolData',
-                        // 2. เลือกว่าจะเอาฟิลด์ไหนจากตาราง "Tool" บ้าง
-                        attributes: ['tool_name']
+                            model: db.Result,
+                            as: 'results',
+                            attributes: ['result_id'],
+                            include: [
+                                {
+                                    model: db.Tool,
+                                    as: 'toolData',
+                                    attributes: ['tool_name']
+                                }
+                            ]
                         }
                     ]
-                    }
-                ]
                 }
+            ],
+            limit: rowPerPage,
+            offset: (page - 1) * rowPerPage,
+            order: [
+                ['created_at', 'DESC']
             ]
-
-            
         });
 
-        const plainCase = allCase.map(singleCase => singleCase.toJSON()) as CaseWithIncludes[];
+        const plainCase = allCases.map(singleCase => singleCase.toJSON()) as CaseWithIncludes[];
         // console.log(plainCase);
 
         const formattedCases = plainCase.map(singleCase => {
@@ -75,7 +102,10 @@ export const getHistory = async (_req: Request, res: Response) => {
 
         return res.status(200).json({
             success: true,
-            case: formattedCases,
+            count: count, // จำนวนเคสทั้งหมด
+            totalPages: Math.ceil(count / rowPerPage), // จำนวนหน้าทั้งหมด
+            currentPage: page, // หน้าปัจจุบัน
+            cases: formattedCases, // ข้อมูลเคสในหน้านี้
         });
     }
     catch (error) {

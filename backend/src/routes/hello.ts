@@ -20,10 +20,10 @@ router.post("/hibp", checkPasswordHibp);
 
 router.get("/insert", insertCase);
 
-router.get("/history", getHistory);
+router.post("/history", getHistory);
 
 router.get("/result/:id", getResult);
 
-router.get('/delete/:id', deleteCaseById);
+router.delete('/delete/:id', deleteCaseById);
 
 export default router;

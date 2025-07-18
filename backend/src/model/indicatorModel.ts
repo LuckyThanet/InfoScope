@@ -13,12 +13,8 @@ export default (sequelize: Sequelize) => {
         autoIncrement: true,
       },
       type: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
-        references: {
-          model: 'indicator_type',
-          key: 'type_id',
-        },
       },
       value: {
         type: DataTypes.STRING,

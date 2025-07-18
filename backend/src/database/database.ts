@@ -17,12 +17,12 @@ const models = initModels(sequelize);
 const db = {
     sequelize,
     Sequelize,
-    Test,
+    // Test,
     Case: models.Case,
     Indicator: models.Indicator,
-    IndicatorType: models.IndicatorType,
+    // IndicatorType: models.IndicatorType,
     Result: models.Result,
-    ResultType: models.ResultType,
+    // ResultType: models.ResultType,
     Tool: models.Tool,
 }
 

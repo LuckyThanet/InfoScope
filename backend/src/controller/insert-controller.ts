@@ -121,11 +121,10 @@ export const insertCase = async (req: Request, res: Response) => {
     for (const resultItem of results) {
       
       // 2.1 ค้นหา ID ของประเภท Indicator และ Tool
-      const indicatorType = await db.IndicatorType.findOne({ where: { type_name: resultItem.indicator_type_name } });
       const tool = await db.Tool.findOne({ where: { tool_name: resultItem.tool_name } });
 
       // ถ้าไม่เจอข้อมูลพื้นฐาน ให้ข้ามไป
-      if (!indicatorType || !tool) {
+      if (!tool) {
         console.warn(`Skipping result due to missing type or tool:`, resultItem);
         continue; 
       }
@@ -134,8 +133,8 @@ export const insertCase = async (req: Request, res: Response) => {
       const [indicator] = await db.Indicator.findOrCreate({
         where: {
           value: resultItem.indicator_value,
+          type: resultItem.indicator_type_name,
           case: newCaseId,
-          type: indicatorType.get('type_id') as number
         },
         transaction: t
       });
@@ -145,8 +144,7 @@ export const insertCase = async (req: Request, res: Response) => {
       await db.Result.create({
         result: JSON.stringify(resultItem.result_data, null, 2), // แปลง object เป็น string
         tool: tool.get('tool_id') as number,
-        indicator: indicatorId,
-        type: 1 // สมมติว่าประเภทผลลัพธ์มี id = 1 (อาจปรับเปลี่ยนตามระบบของคุณ)
+        indicator: indicatorId, // สมมติว่าประเภทผลลัพธ์มี id = 1 (อาจปรับเปลี่ยนตามระบบของคุณ)
       }, { transaction: t });
     }
 

@@ -8,8 +8,8 @@ export interface CaseAttributes {
 
 export interface IndicatorAttributes {
   indicator_id: number;
-  type: number;
   value: string;
+  type: string;
   case: number;
   created_at?: Date;
   updated_at?: Date;
@@ -27,7 +27,6 @@ export interface ResultAttributes {
   result: string;
   tool: number;
   indicator: number;
-  type: number;
   created_at?: Date;
   updated_at?: Date;
 }

@@ -13,7 +13,7 @@ export default (sequelize: Sequelize) => {
         autoIncrement: true,
       },
       result: {
-        type: DataTypes.STRING,
+        type: DataTypes.JSONB,
         allowNull: false,
       },
       tool: {
@@ -30,14 +30,6 @@ export default (sequelize: Sequelize) => {
         references: {
           model: 'indicators',
           key: 'indicator_id',
-        },
-      },
-      type: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'result_type',
-          key: 'result_type_id',
         },
       },
     },
