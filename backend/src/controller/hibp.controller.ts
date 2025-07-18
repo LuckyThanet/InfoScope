@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
+import sha1 from 'crypto-js/sha1';
 
 export const checkPasswordHibp = async (req: Request, res: Response) => {
   const hash = req.body.hash;
@@ -9,6 +10,7 @@ export const checkPasswordHibp = async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Missing password in body' });
   }
 
+  // const hash = sha1(password).toString().toUpperCase();
   const prefix = hash.slice(0, 5);
   const suffix = hash.slice(5);
 

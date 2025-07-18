@@ -13,7 +13,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@faker-js/faker": "^9.9.0",
     "axios": "^1.10.0",
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
