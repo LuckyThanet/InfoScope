@@ -28,7 +28,6 @@ export const runHibp = async (hash: string) => {
       };
     } else {
       return {
-        tool_id: 1,
         breached: false,
         message: 'Password is safe (not found in HIBP).',
       };

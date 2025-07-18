@@ -33,6 +33,8 @@ app.get('/result', hello);
 
 app.delete('/delete', hello);
 
+app.post('/investigate', hello);
+
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'first ("/")' });
 });

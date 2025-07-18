@@ -1,7 +1,9 @@
 export type HistoryResponse = {
   success: boolean;
-  case: HistoryEntry[];
-  total: number;
+  count: number;
+  totalPages: number;
+  currentPage: number;
+  cases: HistoryEntry[];
 };
 
 export type HistoryEntry = {
@@ -10,4 +12,10 @@ export type HistoryEntry = {
   case_type: string;
   created_at: string;
   tools: string[];
+};
+
+export type HistoryBody = {
+  rowPerPage?: number;
+  page?: number;
+  searchName?: string;
 };

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
     MagnifyingGlassIcon,
     EyeIcon,
@@ -8,74 +8,63 @@ import {
 } from '@heroicons/react/24/outline';
 import Table from '../components/common/Table';
 import type { ColDef } from 'ag-grid-community';
+import { useFetchAllHistory } from '../services/api/hooks/useHistory';
+import type { HistoryEntry } from '../services/api/types/history'
 
-interface CaseHistory {
-    caseId: string;
-    caseName: string;
-    dateSearched: string;
-    target?: string;
-    toolsUsed?: string[];
-    // status?: 'completed' | 'in-progress' | 'failed';
-}
+// interface CaseHistory {
+//     caseId: string;
+//     caseName: string;
+//     dateSearched: string;
+//     toolsUsed?: string[];
+// }
 
 const HistoryPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
-    // Sample data
-    const [caseData] = useState<CaseHistory[]>([
-        {
-            caseId: 'CASE-001',
-            caseName: 'John Doe Investigation',
-            dateSearched: '2024-01-15',
-            target: 'johndoe',
-            toolsUsed: ['WHOIS', 'WhatMyName'],
-            // status: 'completed'
-        },
-        {
-            caseId: 'CASE-002',
-            caseName: 'Domain Analysis - example.com',
-            dateSearched: '2024-01-14',
-            target: 'example.com',
-            toolsUsed: ['WHOIS'],
-            // status: 'completed'
-        },
-        {
-            caseId: 'CASE-003',
-            caseName: 'Social Media Footprint',
-            dateSearched: '2024-01-13',
-            target: 'socialuser123',
-            toolsUsed: ['WhatMyName', 'Have I Been Pwned'],
-            // status: 'completed'
-        },
-        {
-            caseId: 'CASE-004',
-            caseName: 'Email Compromise Check',
-            dateSearched: '2024-01-12',
-            target: 'user@email.com',
-            toolsUsed: ['Have I Been Pwned'],
-            // status: 'failed'
-        },
-        {
-            caseId: 'CASE-005',
-            caseName: 'Digital Identity Mapping',
-            dateSearched: '2024-01-11',
-            target: 'digitaluser',
-            toolsUsed: ['WHOIS', 'WhatMyName', 'Have I Been Pwned'],
-            // status: 'in-progress'
-        }
-    ]);
+    // Debounce search term
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+            setCurrentPage(1); // Reset to first page when search changes
+        }, 500); // รอ 500ms หลังจากผู้ใช้หยุดพิมพ์
 
-    // Filter data based on search term
-    const filteredData = useMemo(() => {
-        if (!searchTerm) return caseData;
-        return caseData.filter(item =>
-            item.caseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.caseId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.target?.toLowerCase().includes(searchTerm.toLowerCase())
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    const { data, isLoading, error } = useFetchAllHistory({
+        rowPerPage: itemsPerPage,
+        page: currentPage,
+        searchName: debouncedSearchTerm // ใช้ debouncedSearchTerm แทน searchTerm
+    });
+
+    // Transform API data to match the expected format
+    const transformedData = useMemo(() => {
+        if (!data?.cases) return [];
+        return data.cases
+    }, [data]);
+
+    // Filter data based on search term (now handled by API, but keeping for local filtering if needed)
+
+    // Show loading state
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <div className="text-lg text-gray-600">Loading case history...</div>
+            </div>
         );
-    }, [caseData, searchTerm]);
+    }
+
+    // Show error state
+    if (error) {
+        return (
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <div className="text-lg text-red-600">Error loading case history</div>
+            </div>
+        );
+    }
 
     // Action buttons component for the table
     interface ActionsCellRendererProps {
@@ -103,17 +92,16 @@ const HistoryPage = () => {
     );
 
     // AG Grid columns
-    const columnDefs: ColDef<CaseHistory>[] = [
-        { field: 'caseId', headerName: 'Case ID', minWidth: 120 },
-        { field: 'caseName', headerName: 'Case Name', minWidth: 200 },
-        { field: 'target', headerName: 'Target', minWidth: 150 },
+    const columnDefs: ColDef<HistoryEntry>[] = [
+        { field: 'case_id', headerName: 'Case ID', minWidth: 120 },
+        { field: 'case_name', headerName: 'Case Name', minWidth: 200 },
         {
-            field: 'toolsUsed',
+            field: 'tools',
             headerName: 'Tools Used',
             minWidth: 180,
-            valueGetter: params => params.data?.toolsUsed?.join(', ') ?? ''
+            valueGetter: params => params.data?.tools?.join(', ') ?? ''
         },
-        { field: 'dateSearched', headerName: 'Date Searched', minWidth: 130 },
+        { field: 'created_at', headerName: 'Date Searched', minWidth: 130 },
         {
             headerName: 'Actions',
             minWidth: 160,
@@ -156,7 +144,10 @@ const HistoryPage = () => {
                         <input
                             type="text"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                // ลบ setCurrentPage(1) ออกจากตรงนี้เพราะจะจัดการใน useEffect แล้ว
+                            }}
                             placeholder="Search by Case Name..."
                             className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                         />
@@ -166,18 +157,45 @@ const HistoryPage = () => {
                 {/* Stats Section */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                     <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
-                        <div className="text-2xl font-bold text-blue-700">{caseData.length}</div>
+                        <div className="text-2xl font-bold text-blue-700">{data?.count || 0}</div>
                         <div className="text-sm text-blue-600">Total Cases</div>
                     </div>
                 </div>
 
                 {/* Data Table */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <Table<CaseHistory>
-                        rowData={filteredData}
+                    <Table<HistoryEntry>
+                        rowData={transformedData}
                         columnDefs={columnDefs}
                     />
                 </div>
+
+                {/* Pagination */}
+                {data && data.totalPages > 1 && (
+                    <div className="flex items-center justify-between mt-6">
+                        <div className="text-sm text-gray-700">
+                            Showing page {data.currentPage} of {data.totalPages} ({data.count} total cases)
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                                className="flex items-center gap-1 px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <ChevronLeftIcon className="w-4 h-4" />
+                                Previous
+                            </button>
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, data.totalPages))}
+                                disabled={currentPage === data.totalPages}
+                                className="flex items-center gap-1 px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Next
+                                <ChevronRightIcon className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
