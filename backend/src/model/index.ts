@@ -29,16 +29,16 @@ export const initModels = (sequelize: Sequelize) => {
   });
 
   // IndicatorType has many Indicators (one-to-many)
-  IndicatorType.hasMany(Indicator, {
-    foreignKey: 'type',
-    sourceKey: 'type_id',
-    as: 'indicators',
-  });
-  Indicator.belongsTo(IndicatorType, {
-    foreignKey: 'type',
-    targetKey: 'type_id',
-    as: 'indicatorType',
-  });
+  // IndicatorType.hasMany(Indicator, {
+  //   foreignKey: 'type',
+  //   sourceKey: 'type_id',
+  //   as: 'indicators',
+  // });
+  // Indicator.belongsTo(IndicatorType, {
+  //   foreignKey: 'type',
+  //   targetKey: 'type_id',
+  //   as: 'indicatorType',
+  // });
 
   // Indicator has many Results (one-to-many)
   Indicator.hasMany(Result, {
@@ -65,23 +65,23 @@ export const initModels = (sequelize: Sequelize) => {
   });
 
   // ResultType has many Results (one-to-many)
-  ResultType.hasMany(Result, {
-    foreignKey: 'type',
-    sourceKey: 'result_type_id',
-    as: 'results',
-  });
-  Result.belongsTo(ResultType, {
-    foreignKey: 'type',
-    targetKey: 'result_type_id',
-    as: 'resultType',
-  });
+  // ResultType.hasMany(Result, {
+  //   foreignKey: 'type',
+  //   sourceKey: 'result_type_id',
+  //   as: 'results',
+  // });
+  // Result.belongsTo(ResultType, {
+  //   foreignKey: 'type',
+  //   targetKey: 'result_type_id',
+  //   as: 'resultType',
+  // });
 
   return {
     Case,
     Indicator,
-    IndicatorType,
+    // IndicatorType,
     Result,
-    ResultType,
+    // ResultType,
     Tool,
   };
 };

@@ -6,6 +6,8 @@ import {
     ChevronLeftIcon,
     ChevronRightIcon
 } from '@heroicons/react/24/outline';
+import Table from '../components/common/Table';
+import type { ColDef } from 'ag-grid-community';
 
 interface CaseHistory {
     caseId: string;
@@ -13,13 +15,13 @@ interface CaseHistory {
     dateSearched: string;
     target?: string;
     toolsUsed?: string[];
-    status?: 'completed' | 'in-progress' | 'failed';
+    // status?: 'completed' | 'in-progress' | 'failed';
 }
 
 const HistoryPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+    const itemsPerPage = 10;
 
     // Sample data
     const [caseData] = useState<CaseHistory[]>([
@@ -29,7 +31,7 @@ const HistoryPage = () => {
             dateSearched: '2024-01-15',
             target: 'johndoe',
             toolsUsed: ['WHOIS', 'WhatMyName'],
-            status: 'completed'
+            // status: 'completed'
         },
         {
             caseId: 'CASE-002',
@@ -37,7 +39,7 @@ const HistoryPage = () => {
             dateSearched: '2024-01-14',
             target: 'example.com',
             toolsUsed: ['WHOIS'],
-            status: 'completed'
+            // status: 'completed'
         },
         {
             caseId: 'CASE-003',
@@ -45,7 +47,7 @@ const HistoryPage = () => {
             dateSearched: '2024-01-13',
             target: 'socialuser123',
             toolsUsed: ['WhatMyName', 'Have I Been Pwned'],
-            status: 'completed'
+            // status: 'completed'
         },
         {
             caseId: 'CASE-004',
@@ -53,7 +55,7 @@ const HistoryPage = () => {
             dateSearched: '2024-01-12',
             target: 'user@email.com',
             toolsUsed: ['Have I Been Pwned'],
-            status: 'failed'
+            // status: 'failed'
         },
         {
             caseId: 'CASE-005',
@@ -61,7 +63,7 @@ const HistoryPage = () => {
             dateSearched: '2024-01-11',
             target: 'digitaluser',
             toolsUsed: ['WHOIS', 'WhatMyName', 'Have I Been Pwned'],
-            status: 'in-progress'
+            // status: 'in-progress'
         }
     ]);
 
@@ -75,22 +77,66 @@ const HistoryPage = () => {
         );
     }, [caseData, searchTerm]);
 
-    // Pagination
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    const paginatedData = useMemo(() => {
-        const start = (currentPage - 1) * itemsPerPage;
-        return filteredData.slice(start, start + itemsPerPage);
-    }, [filteredData, currentPage]);
+    // Action buttons component for the table
+    interface ActionsCellRendererProps {
+        caseId: string;
+        onView: (caseId: string) => void;
+        onDelete: (caseId: string) => void;
+    }
 
-    const handleViewDetails = (caseId: string) => {
+    const ActionsCellRenderer: React.FC<ActionsCellRendererProps> = ({ caseId, onView, onDelete }) => (
+        <div className="flex gap-2">
+            <button
+                onClick={() => onView(caseId)}
+                className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors text-sm"
+            >
+                <EyeIcon className="w-4 h-4" />
+                View Details
+            </button>
+            <button
+                onClick={() => onDelete(caseId)}
+                className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors text-sm"
+            >
+                <TrashIcon className="w-4 h-4" />
+            </button>
+        </div>
+    );
+
+    // AG Grid columns
+    const columnDefs: ColDef<CaseHistory>[] = [
+        { field: 'caseId', headerName: 'Case ID', minWidth: 120 },
+        { field: 'caseName', headerName: 'Case Name', minWidth: 200 },
+        { field: 'target', headerName: 'Target', minWidth: 150 },
+        {
+            field: 'toolsUsed',
+            headerName: 'Tools Used',
+            minWidth: 180,
+            valueGetter: params => params.data?.toolsUsed?.join(', ') ?? ''
+        },
+        { field: 'dateSearched', headerName: 'Date Searched', minWidth: 130 },
+        {
+            headerName: 'Actions',
+            minWidth: 160,
+            cellRenderer: (params: import('ag-grid-community').ICellRendererParams) => {
+                // Render the React component using React.createElement
+                return (
+                    <ActionsCellRenderer
+                        caseId={params.data.caseId}
+                        onView={handleViewDetails}
+                        onDelete={handleDelete}
+                    />
+                );
+            }
+        }
+    ];
+
+    function handleViewDetails(caseId: string) {
         console.log('View details for:', caseId);
-        // Navigate to case details page
-    };
+    }
 
-    const handleDelete = (caseId: string) => {
+    function handleDelete(caseId: string) {
         console.log('Delete case:', caseId);
-        // Show confirmation dialog and delete
-    };
+    }
 
     return (
         <div className="min-h-screen bg-white">
@@ -123,182 +169,14 @@ const HistoryPage = () => {
                         <div className="text-2xl font-bold text-blue-700">{caseData.length}</div>
                         <div className="text-sm text-blue-600">Total Cases</div>
                     </div>
-                    <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
-                        <div className="text-2xl font-bold text-green-700">
-                            {caseData.filter(c => c.status === 'completed').length}
-                        </div>
-                        <div className="text-sm text-green-600">Completed</div>
-                    </div>
-                    <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 p-4 rounded-lg border border-yellow-200">
-                        <div className="text-2xl font-bold text-yellow-700">
-                            {caseData.filter(c => c.status === 'in-progress').length}
-                        </div>
-                        <div className="text-sm text-yellow-600">In Progress</div>
-                    </div>
-                    <div className="bg-gradient-to-r from-red-50 to-red-100 p-4 rounded-lg border border-red-200">
-                        <div className="text-2xl font-bold text-red-700">
-                            {caseData.filter(c => c.status === 'failed').length}
-                        </div>
-                        <div className="text-sm text-red-600">Failed</div>
-                    </div>
                 </div>
 
                 {/* Data Table */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Case ID
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Case Name
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Target
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Tools Used
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Date Searched
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {paginatedData.map((item, index) => (
-                                    <tr key={item.caseId} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
-                                            {item.caseId}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {item.caseName}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-700 bg-gray-50">
-                                            {item.target}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex flex-wrap gap-1">
-                                                {item.toolsUsed?.map((tool, toolIndex) => (
-                                                    <span
-                                                        key={toolIndex}
-                                                        className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
-                                                    >
-                                                        {tool}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {item.dateSearched}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                                item.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                                item.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' :
-                                                'bg-red-100 text-red-800'
-                                            }`}>
-                                                {item.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => handleViewDetails(item.caseId)}
-                                                    className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors text-sm"
-                                                >
-                                                    <EyeIcon className="w-4 h-4" />
-                                                    View Details
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(item.caseId)}
-                                                    className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors text-sm"
-                                                >
-                                                    <TrashIcon className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Pagination */}
-                    <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
-                        <div className="flex-1 flex justify-between sm:hidden">
-                            <button 
-                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                disabled={currentPage === 1}
-                                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                            >
-                                Previous
-                            </button>
-                            <button 
-                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                disabled={currentPage === totalPages}
-                                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                            >
-                                Next
-                            </button>
-                        </div>
-                        <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                            <div>
-                                <p className="text-sm text-gray-700">
-                                    Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
-                                    <span className="font-medium">
-                                        {Math.min(currentPage * itemsPerPage, filteredData.length)}
-                                    </span>{' '}
-                                    of <span className="font-medium">{filteredData.length}</span> results
-                                </p>
-                            </div>
-                            <div>
-                                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                                    <button
-                                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                        disabled={currentPage === 1}
-                                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                                    >
-                                        <span className="sr-only">Previous</span>
-                                        <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
-                                    </button>
-                                    {Array.from({ length: totalPages }).map((_, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => setCurrentPage(i + 1)}
-                                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                                                currentPage === i + 1
-                                                    ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                            }`}
-                                        >
-                                            {i + 1}
-                                        </button>
-                                    ))}
-                                    <button
-                                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                        disabled={currentPage === totalPages}
-                                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                                    >
-                                        <span className="sr-only">Next</span>
-                                        <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
-                                    </button>
-                                </nav>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Footer Info */}
-                <div className="mt-6 text-center text-sm text-gray-500">
-                    Showing {filteredData.length} of {caseData.length} cases
+                    <Table<CaseHistory>
+                        rowData={filteredData}
+                        columnDefs={columnDefs}
+                    />
                 </div>
             </div>
         </div>
