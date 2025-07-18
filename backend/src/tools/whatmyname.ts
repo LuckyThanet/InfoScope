@@ -83,7 +83,6 @@ export const runWhatMyName = async (account: string) => {
     
     await Promise.allSettled(checks);
     return {
-        tool_id: 2,
         found: found,
     };
 

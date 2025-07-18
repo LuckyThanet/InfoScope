@@ -39,18 +39,15 @@ export const runWhois = async (domain: string) => {
     
     const dnsResult: DnsLookupResult = await dnsLookup(domain, { family: 4 }) as DnsLookupResult;
     
-    const tmp = whoisParser({
+    const parsedData = whoisParser({
       success: true,
       ip: dnsResult.address,
       family: dnsResult.family,
       data: result,
     });
 
-    return {
-      tool_id: 3,
-      success: true,
-      tmp
-    };
+    return parsedData;
+    
   } catch (error: any) {
     return {
       success: false,

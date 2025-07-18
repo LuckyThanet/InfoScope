@@ -46,16 +46,48 @@ export const startInvestigation = async (req: Request, res: Response) => {
     // รันทุก Promises พร้อมกัน และรอจนกว่าทั้งหมดจะเสร็จ
     const results = await Promise.all(promises);
 
+    const formattedResults = tools_to_run
+      .map((toolName: string, index: number) => {
+        const resultData = results[index];
+
+        // ถ้า tool นั้นไม่ได้ถูกรัน หรือไม่มีผลลัพธ์ ให้ข้ามไป
+        if (!resultData) {
+          return null;
+        }
+
+        // สร้าง object ใหม่สำหรับผลลัพธ์แต่ละอัน
+        let indicatorTypeName = '';
+        let indicatorValue = '';
+
+        if (toolName === 'WHOIS') {
+          indicatorTypeName = 'Domain Name';
+          indicatorValue = parameters.domain;
+        }
+        if (toolName === 'WhatMyName') {
+          indicatorTypeName = 'Username';
+          indicatorValue = parameters.username;
+        }
+        if (toolName === 'Have I Been Pwned') {
+          indicatorTypeName = 'Password';
+          indicatorValue = parameters.password;
+        }
+
+        return {
+          tool_name: toolName.toLowerCase(), // ทำให้เป็นตัวพิมพ์เล็ก
+          indicator_type_name: indicatorTypeName,
+          indicator_value: indicatorValue,
+          result_data: resultData
+        };
+      })
+      .filter(Boolean); 
+
     // ประกอบร่าง Response สุดท้าย
-    const finalResponse: { [key: string]: any } = {};
-    tools_to_run.forEach((toolName: string, index: number) => {
-      if (results[index]) {
-        finalResponse[toolName] = results[index];
-      }
-    });
+    const finalResponse = {
+        results: formattedResults
+    };
 
     return res.status(200).json({
-      success: true,
+      case_name: 'Investigation Results',
       results: finalResponse
     });
 
