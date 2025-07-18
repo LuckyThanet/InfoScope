@@ -17,6 +17,7 @@
     "ag-grid-react": "^34.0.2",
     "axios": "^1.10.0",
     "crypto-js": "^4.2.0",
+    "dayjs": "^1.11.13",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.3"

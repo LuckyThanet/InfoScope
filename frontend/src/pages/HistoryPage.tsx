@@ -10,13 +10,7 @@ import Table from '../components/common/Table';
 import type { ColDef } from 'ag-grid-community';
 import { useFetchAllHistory } from '../services/api/hooks/useHistory';
 import type { HistoryEntry } from '../services/api/types/history'
-
-// interface CaseHistory {
-//     caseId: string;
-//     caseName: string;
-//     dateSearched: string;
-//     toolsUsed?: string[];
-// }
+import dayjs from 'dayjs';
 
 const HistoryPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -101,10 +95,17 @@ const HistoryPage = () => {
             minWidth: 180,
             valueGetter: params => params.data?.tools?.join(', ') ?? ''
         },
-        { field: 'created_at', headerName: 'Date Searched', minWidth: 130 },
+        {
+            field: 'created_at', headerName: 'Date Searched', minWidth: 150, valueFormatter: params => {
+                if (params.value) {
+                    return dayjs(params.value).format('DD/MM/YYYY HH:mm');
+                }
+                return '';
+            }
+        },
         {
             headerName: 'Actions',
-            minWidth: 160,
+            minWidth: 100,
             cellRenderer: (params: import('ag-grid-community').ICellRendererParams) => {
                 // Render the React component using React.createElement
                 return (
