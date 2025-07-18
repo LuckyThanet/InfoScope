@@ -34,6 +34,7 @@ export const checkPasswordHibp = async (req: Request, res: Response) => {
       });
     } else {
       return res.status(200).json({
+        tool_id: 1,
         breached: false,
         message: 'Password is safe (not found in HIBP).',
       });

@@ -86,7 +86,8 @@ export const getWmn = async (req: Request, res: Response) => {
     
     await Promise.allSettled(checks);
     return res.status(200).json({
-      found: found,
+        tool_id: 2,
+        found: found,
     });
 
 };

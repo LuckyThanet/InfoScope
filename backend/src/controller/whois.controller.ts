@@ -50,10 +50,9 @@ export const getWhoisInfo = async (req: Request, res: Response): Promise<Respons
     });
 
     return res.status(200).json({
+      tool_id: 3,
       success: true,
-      ip: dnsResult.address,
-      family: dnsResult.family,
-      data: result,
+      tmp
     });
   } catch (error: any) {
     return res.status(500).json({

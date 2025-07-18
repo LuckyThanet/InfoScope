@@ -25,6 +25,14 @@ app.post('/wmn', hello);
 
 app.post('/hipn', hello);
 
+app.get('/insert', hello);
+
+app.get('/history', hello);
+
+app.get('/result', hello);
+
+app.get('/delete', hello);
+
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'first ("/")' });
 });
@@ -39,8 +47,8 @@ app.use('*', (req: Request, res: Response) => {
 const startServer = async () => {
   try {
     await database.sequelize.authenticate();
-    await database.sequelize.sync({ force: true }); 
-    await database.sequelize.sync(); 
+    await database.sequelize.sync({ force: false }); 
+    // await database.sequelize.sync(); 
 
     console.log('Connection has been established successfully.');
 
