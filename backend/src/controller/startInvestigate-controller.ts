@@ -48,10 +48,10 @@ export const startInvestigation = async (req: Request, res: Response) => {
 
     const formattedResults = tools_to_run
       .map((toolName: string, index: number) => {
-        const resultData = results[index];
+        const result_data = results[index];
 
         // ถ้า tool นั้นไม่ได้ถูกรัน หรือไม่มีผลลัพธ์ ให้ข้ามไป
-        if (!resultData) {
+        if (!result_data) {
           return null;
         }
 
@@ -76,7 +76,7 @@ export const startInvestigation = async (req: Request, res: Response) => {
           tool_name: toolName.toLowerCase(), // ทำให้เป็นตัวพิมพ์เล็ก
           indicator_type_name: indicatorTypeName,
           indicator_value: indicatorValue,
-          resultData
+          result_data
         };
       })
       .filter(Boolean); 
