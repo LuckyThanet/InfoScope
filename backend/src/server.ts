@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import database from "./database/database";
 import cors from 'cors';
-import hello from "./routes/hello";
+import apiRouter from "./routes/apiRouter";
 
 const app:Express = express();
 const PORT = process.env.PORT || 3000;
@@ -16,24 +16,8 @@ app.use(
 );
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api/', hello);
+app.use('/api/', apiRouter);
 // Routes
-
-// app.post('/whois', hello);
-
-// app.post('/wmn', hello);
-
-// app.post('/hipn', hello);
-
-// app.get('/insert', hello);
-
-// app.post('/history', hello);
-
-// app.get('/result', hello);
-
-// app.delete('/delete', hello);
-
-// app.post('/investigate', hello);
 
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'first ("/")' });

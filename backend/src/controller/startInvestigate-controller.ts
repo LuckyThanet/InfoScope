@@ -8,9 +8,9 @@ type ToolFunction = (input: string) => Promise<any>;
 
 // สร้าง Map เพื่อจับคู่ชื่อ tool กับฟังก์ชัน โดยกำหนด Type ที่สร้างไว้
 const toolFunctionMap: { [key: string]: ToolFunction } = {
-  'WHOIS': runWhois,
-  'WhatMyName': runWhatMyName,
-  'Have I Been Pwned': runHibp,
+  'whois': runWhois,
+  'whatmyname': runWhatMyName,
+  'hibp': runHibp,
 };
 
 
@@ -31,9 +31,9 @@ export const startInvestigation = async (req: Request, res: Response) => {
       if (toolFunction) {
         // กำหนด input สำหรับแต่ละ tool
         let input: string | undefined;
-        if (toolName === 'WHOIS') input = parameters.domain;
-        if (toolName === 'WhatMyName') input = parameters.username;
-        if (toolName === 'Have I Been Pwned') input = parameters.password;
+        if (toolName === 'whois') input = parameters.domain;
+        if (toolName === 'whatmyname') input = parameters.username;
+        if (toolName === 'hibp') input = parameters.password;
         
         // รันฟังก์ชันถ้ามี input
         if (input) {
@@ -59,15 +59,15 @@ export const startInvestigation = async (req: Request, res: Response) => {
         let indicatorTypeName = '';
         let indicatorValue = '';
 
-        if (toolName === 'WHOIS') {
+        if (toolName === 'whois') {
           indicatorTypeName = 'Domain Name';
           indicatorValue = parameters.domain;
         }
-        if (toolName === 'WhatMyName') {
+        if (toolName === 'whatmyname') {
           indicatorTypeName = 'Username';
           indicatorValue = parameters.username;
         }
-        if (toolName === 'Have I Been Pwned') {
+        if (toolName === 'hibp') {
           indicatorTypeName = 'Password';
           indicatorValue = parameters.password;
         }

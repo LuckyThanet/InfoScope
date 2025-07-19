@@ -82,8 +82,24 @@ export const runWhatMyName = async (account: string) => {
     });
     
     await Promise.allSettled(checks);
+
+    const formattedFoundData = found.map(line => {
+        // หาตำแหน่งของเครื่องหมาย ':' ตัวแรก
+        const delimiterIndex = line.indexOf(':');
+
+        // กรณีที่บางบรรทัดไม่มี ':' ให้จัดการอย่างปลอดภัย
+        if (delimiterIndex === -1) {
+            return { platform: line, link: '' };
+        }
+
+        // แยก platform และ link ออกจากกัน
+        const platform = line.substring(0, delimiterIndex).trim();
+        const link = line.substring(delimiterIndex + 1).trim();
+
+        return { platform, link };
+    });
     return {
-        found: found,
+        found: formattedFoundData,
     };
 
 };
