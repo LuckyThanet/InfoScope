@@ -82,13 +82,13 @@ export const startInvestigation = async (req: Request, res: Response) => {
       .filter(Boolean); 
 
     // ประกอบร่าง Response สุดท้าย
-    const finalResponse = {
-        results: formattedResults
-    };
+    // const finalResponse = {
+    //     formattedResults
+    // };
 
     return res.status(200).json({
       case_name: 'Investigation Results',
-      results: finalResponse
+      results: formattedResults
     });
 
   } catch (error) {
