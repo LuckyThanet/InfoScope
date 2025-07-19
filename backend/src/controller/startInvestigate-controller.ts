@@ -89,7 +89,7 @@ export const startInvestigation = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       data:{
-        case_name: 'Investigation Results',
+        // case_name: 'Investigation Results',
         results: formattedResults
       }
     });
