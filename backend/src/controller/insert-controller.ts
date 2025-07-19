@@ -56,8 +56,8 @@ export const insertCase = async (req: Request, res: Response) => {
   const t = await db.sequelize.transaction();
 
   try {
-    // const { case_name, results } = req.body;
-    const { case_name, results } = mockup;
+    const { case_name, results } = req.body;
+    // const { case_name, results } = mockup;
 
     // 1. สร้าง Case หลักก่อนภายใต้ Transaction
     const newCase = await db.Case.create({

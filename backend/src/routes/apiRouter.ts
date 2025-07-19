@@ -7,7 +7,7 @@ import { startInvestigation } from "../controller/startInvestigate-controller";
 
 const router = Router();
 
-router.get("/insert", insertCase);
+router.post("/insert", insertCase);
 
 router.post("/history", getHistory);
 
