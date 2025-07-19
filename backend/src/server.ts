@@ -50,7 +50,7 @@ const startServer = async () => {
   try {
     await database.sequelize.authenticate();
     await database.sequelize.sync({ force: false }); 
-    // await database.sequelize.sync(); 
+    await database.sequelize.sync(); 
 
     console.log('Connection has been established successfully.');
 
