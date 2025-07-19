@@ -6,7 +6,7 @@ export const deleteCaseById = async (req: Request, res: Response) => {
 
   try {
 
-    const caseId = parseInt(req.params.body, 10);
+    const caseId = parseInt(req.body.case_id, 10);
     // const caseId = parseInt(req.body.id, 10);
 
     if (isNaN(caseId)) {

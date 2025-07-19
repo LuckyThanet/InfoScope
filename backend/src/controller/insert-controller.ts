@@ -109,7 +109,6 @@ export const insertCase = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    // 4. ถ้ามีข้อผิดพลาดเกิดขึ้น ให้ rollback (ยกเลิกการบันทึกทั้งหมด)
     await t.rollback();
     
     console.error('Failed to save investigation:', error);
