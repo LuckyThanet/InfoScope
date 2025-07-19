@@ -1,96 +1,71 @@
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
+import limit from 'p-limit'; // 1. Import p-limit
 
 const filePath = path.join(__dirname, '../storage/wmn-data.json');
 const platforms = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-
-// const sitesObject = platforms.find((item: any) => item.sites);
-
-// if (!sitesObject) {
-//   throw new Error("Could not find the 'sites' array in the JSON data.");
-// }
-
-// const siteList = sitesObject.sites;
-
 const sitesObject = platforms.flatMap((category: any) => category.sites || []);
 
-// console.log(siteList[0]);
-// console.log(platforms[3].sites[0].name);
-
-const facebookSiteData = sitesObject.find((site: { name: string; }) => site.name === "Facebook");
-
 export const runWhatMyName = async (account: string) => {
-
     const found: string[] = [];
+    
+    // 2. สร้างตัวจำกัด (limit) ให้ทำงานพร้อมกันได้ไม่เกิน 20 requests
+    const pLimit = limit(20); 
 
-    // const test = await axios.get(https://api.github.com/users/luckythanet);
-    // console.log(test);
-    // if(test.status == 200) {
-    //     return;
-    // }
+    const checks = sitesObject.map((site: any) => {
+        // 3. ครอบฟังก์ชัน async ของเราด้วย pLimit
+        return pLimit(async () => {
+            const url_check = site.uri_check.replace('{account}', account);
+            const url_pretty = (site.uri_pretty || site.uri_check).replace('{account}', account);
 
-    const checks = sitesObject.map(async (site: any) => {
-        const url_check = site.uri_check.replace('{account}', account);
-        const url_pretty = (site.uri_pretty || site.uri_check).replace('{account}', account);
-        // console.log(url_check);
+            try {
+                // เรายังคงใช้ timeout ที่เหมาะสม (เช่น 20 วิ) และ User-Agent ได้
+                const res = await axios.get(url_check, {
+                    timeout: 20000,
+                    responseType: 'text',
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                    }
+                });
+                
+                const responseBody = res.data;
+                let isFound = false;
 
-        try {
-            // console.log(url_check : ${url_check});
-            // if (site.name == "Facebook") {
-            //     console.log(url_check);
-            // }
-            const res = await axios.get(url_check, {
-                responseType: 'text',
-            });
-            const responseBody = res.data;
-
-            let isFound = false;
-
-            // 1. เช็ค Status Code ที่ถูกต้องตามที่ระบุในไฟล์ json
-            if (res.status === site.e_code) {
-                // console.log("200")
-                // console.log(`${site.name} : ${res.status}`);
-                // 2. เช็คว่ามีข้อความที่บ่งบอกว่า "ไม่เจอ" หรือไม่
-                if (site.m_string && responseBody.includes(site.m_string)) {
-                    isFound = false; // ถ้าเจอข้อความ m_string แสดงว่าไม่พบโปรไฟล์
+                if (res.status === site.e_code) {
+                    if (site.m_string && responseBody.includes(site.m_string)) {
+                        isFound = false;
+                    } else if (site.e_string && responseBody.includes(site.e_string)) {
+                        isFound = true;
+                    } else if (!site.e_string && !site.m_string) {
+                        isFound = true;
+                    }
                 }
-                // 3. เช็คว่ามีข้อความที่ "ควรจะเจอ" หรือไม่ (ถ้า m_string ไม่เจอ)
-                if (site.e_string && responseBody.includes(site.e_string)) {
-                    isFound = true; // ถ้าเจอข้อความ e_string แสดงว่าพบโปรไฟล์
+                
+                if (isFound) {
+                    console.log("succuess \n");
+                    found.push(`${site.name}: ${url_pretty}`);
                 }
-                // 4. กรณีที่ไม่มีทั้ง e_string และ m_string แต่ status code ถูกต้อง
-                else if (!site.e_string && !site.m_string) {
-                    isFound = true;
-                }
+            } catch (err: any) {
+                console.log(`Error checking ${site.name}:`/*, err.code || err.message*/);
             }
-            if (isFound) {
-                found.push(`${site.name}: ${url_pretty}`);
-            }
-        } catch (err: any) {
-            console.log(site.name, "");
-        }
+        });
     });
     
-    await Promise.allSettled(checks);
+    // Promise.all หรือ Promise.allSettled ก็ได้ในกรณีนี้
+    await Promise.all(checks);
 
     const formattedFoundData = found.map(line => {
-        // หาตำแหน่งของเครื่องหมาย ':' ตัวแรก
         const delimiterIndex = line.indexOf(':');
-
-        // กรณีที่บางบรรทัดไม่มี ':' ให้จัดการอย่างปลอดภัย
         if (delimiterIndex === -1) {
             return { platform: line, link: '' };
         }
-
-        // แยก platform และ link ออกจากกัน
         const platform = line.substring(0, delimiterIndex).trim();
         const link = line.substring(delimiterIndex + 1).trim();
-
         return { platform, link };
     });
+
     return {
         found: formattedFoundData,
     };
-
 };
