@@ -27,8 +27,14 @@ const mockup = {
       "indicator_value": "luckythanet",
       "result_data": {
         "found": [
-          "Disqus: https://disqus.com/by/luckythanet/",
-          "GitHub: https://github.com/luckythanet"
+          {
+                            "link": "https://github.com/johndoe99",
+                            "platform": "GitHub"
+                        },
+                        {
+                            "link": "https://twitter.com/johndoe99",
+                            "platform": "Twitter"
+                        }
         ]
       }
     },

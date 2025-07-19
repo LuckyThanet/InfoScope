@@ -37,11 +37,11 @@ export const runWhatMyName = async (account: string) => {
 
         try {
             // console.log(url_check : ${url_check});
-            if (site.name == "Facebook") {
-                console.log(url_check);
-            }
+            // if (site.name == "Facebook") {
+            //     console.log(url_check);
+            // }
             const res = await axios.get(url_check, {
-                timeout: 10000,
+                timeout: 15000,
                 responseType: 'text',
             });
             const responseBody = res.data;
@@ -51,7 +51,7 @@ export const runWhatMyName = async (account: string) => {
             // 1. เช็ค Status Code ที่ถูกต้องตามที่ระบุในไฟล์ json
             if (res.status === site.e_code) {
                 // console.log("200")
-                console.log(`${site.name} : ${res.status}`);
+                // console.log(`${site.name} : ${res.status}`);
                 // 2. เช็คว่ามีข้อความที่บ่งบอกว่า "ไม่เจอ" หรือไม่
                 if (site.m_string && responseBody.includes(site.m_string)) {
                     if (site.name == "Facebook") {
@@ -74,10 +74,10 @@ export const runWhatMyName = async (account: string) => {
                 found.push(`${site.name}: ${url_pretty}`);
             }
         } catch (err: any) {
-            // console.log(site.name, "");
-            if (site.name == "Facebook") {
-                console.log("Got Error on : ", err);
-            }
+            console.log(site.name, "");
+            // if (site.name == "Facebook") {
+            //     console.log("Got Error on : ", err);
+            // }
         }
     });
     
