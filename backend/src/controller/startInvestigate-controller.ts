@@ -87,8 +87,11 @@ export const startInvestigation = async (req: Request, res: Response) => {
     // };
 
     return res.status(200).json({
-      case_name: 'Investigation Results',
-      results: formattedResults
+      success: true,
+      data:{
+        case_name: 'Investigation Results',
+        results: formattedResults
+      }
     });
 
   } catch (error) {
