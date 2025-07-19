@@ -1,3 +1,11 @@
+
+
+
+export type HistoryResponse = {
+ success: boolean;
+ data: InvestigationResults;
+};
+
 export type InvestigationResults = {
   case_name: string;
   results: InvestigationResult[];

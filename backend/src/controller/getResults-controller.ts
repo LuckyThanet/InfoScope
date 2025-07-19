@@ -64,7 +64,7 @@ export const getResult = async (_req: Request, res: Response) => {
         try {
           parsedResultData = JSON.parse(result.result);
         } catch (e) {
-          parsedResultData = { raw_text: result.result };
+          parsedResultData = result.result ;
         }
         return {
           tool_name: result.toolData?.tool_name,

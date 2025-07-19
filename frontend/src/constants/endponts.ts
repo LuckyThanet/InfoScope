@@ -3,6 +3,6 @@ export const ENDPOINTS = {
     FETCH_HISTORY: "history",
   },
   RESULTS: {
-    FETCH_INVESTIGATION_RESULTS: "",
+    FETCH_INVESTIGATION_RESULTS: "results/:Id",
   },
 };

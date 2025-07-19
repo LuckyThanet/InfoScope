@@ -19,21 +19,21 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/', hello);
 // Routes
 
-app.post('/whois', hello);
+// app.post('/whois', hello);
 
-app.post('/wmn', hello);
+// app.post('/wmn', hello);
 
-app.post('/hipn', hello);
+// app.post('/hipn', hello);
 
-app.get('/insert', hello);
+// app.get('/insert', hello);
 
-app.post('/history', hello);
+// app.post('/history', hello);
 
-app.get('/result', hello);
+// app.get('/result', hello);
 
-app.delete('/delete', hello);
+// app.delete('/delete', hello);
 
-app.post('/investigate', hello);
+// app.post('/investigate', hello);
 
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'first ("/")' });

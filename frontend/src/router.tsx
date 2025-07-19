@@ -9,7 +9,13 @@ const router = createBrowserRouter(
     [
         {
             path: "/",
-        element: <HomePage />,
+            element: <HomePage />,
+            children: [
+                {
+                    path: ":id",
+                    element: <ResultsPage />,
+                }
+            ]
         },
         {
             path: "/testPage",
@@ -20,10 +26,10 @@ const router = createBrowserRouter(
             path: "/history",
             element: <HistoryPage />,
         },
-        {
-            path: '/results',
-            element: <ResultsPage />,
-        },
+        // {
+        //     path: '/results',
+        //     element: <ResultsPage />,
+        // },
         {
             path: "/testDatagrid",
             element: <TestDatagrid />,
