@@ -53,9 +53,6 @@ export const runWhatMyName = async (account: string) => {
                 // console.log(`${site.name} : ${res.status}`);
                 // 2. เช็คว่ามีข้อความที่บ่งบอกว่า "ไม่เจอ" หรือไม่
                 if (site.m_string && responseBody.includes(site.m_string)) {
-                    if (site.name == "Facebook") {
-                        console.log("Condition one");
-                    }
                     isFound = false; // ถ้าเจอข้อความ m_string แสดงว่าไม่พบโปรไฟล์
                 }
                 // 3. เช็คว่ามีข้อความที่ "ควรจะเจอ" หรือไม่ (ถ้า m_string ไม่เจอ)
@@ -67,16 +64,11 @@ export const runWhatMyName = async (account: string) => {
                     isFound = true;
                 }
             }
-            // console.log(site.name);
-            console.log(`isFound of ${site.name} : ${isFound}\n`);
             if (isFound) {
                 found.push(`${site.name}: ${url_pretty}`);
             }
         } catch (err: any) {
             console.log(site.name, "");
-            // if (site.name == "Facebook") {
-            //     console.log("Got Error on : ", err);
-            // }
         }
     });
     
