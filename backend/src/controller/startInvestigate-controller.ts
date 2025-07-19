@@ -76,7 +76,7 @@ export const startInvestigation = async (req: Request, res: Response) => {
           tool_name: toolName.toLowerCase(), // ทำให้เป็นตัวพิมพ์เล็ก
           indicator_type_name: indicatorTypeName,
           indicator_value: indicatorValue,
-          result_data: resultData
+          resultData
         };
       })
       .filter(Boolean); 
