@@ -41,7 +41,6 @@ export const runWhatMyName = async (account: string) => {
             //     console.log(url_check);
             // }
             const res = await axios.get(url_check, {
-                timeout: 15000,
                 responseType: 'text',
             });
             const responseBody = res.data;
