@@ -6,7 +6,8 @@ import {
     ArrowTopRightOnSquareIcon,
     DocumentTextIcon,
     CalendarIcon,
-    CheckCircleIcon
+    CheckCircleIcon,
+    DocumentArrowDownIcon
 } from '@heroicons/react/24/outline';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/solid';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
@@ -21,6 +22,7 @@ import type {
     InvestigationResults
 } from '../services/api/types/result';
 import axios from 'axios';
+import { exportResultsToCSV, exportResultsToJSON } from '../util/helper';
 
 // Type guard functions with better validation
 const isWhoisResult = (result: InvestigationResult): result is InvestigationResult & { result_data: WhoisResultData } => {
@@ -184,6 +186,28 @@ const ResultsPage: React.FC = () => {
         } finally {
             setIsSaving(false); // หยุด loading
         }
+    };
+
+    const handleExportCSV = () => {
+        if (!results?.data) return;
+
+        const exportData: InvestigationResults = {
+            case_name: results.data.case_name || case_name || 'Investigation Results',
+            results: results.data.results,
+        };
+
+        exportResultsToCSV(exportData);
+    };
+
+    const handleExportJSON = () => {
+        if (!results?.data) return;
+
+        const exportData: InvestigationResults = {
+            case_name: results.data.case_name || case_name || 'Investigation Results',
+            results: results.data.results,
+        };
+
+        exportResultsToJSON(exportData);
     };
 
     return (
@@ -473,6 +497,13 @@ const ResultsPage: React.FC = () => {
                     >
                         Home Page
                     </button>
+                    <button
+                        onClick={handleExportCSV}
+                        className="group flex items-center gap-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold rounded-xl px-6 py-3 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    >
+                        <DocumentArrowDownIcon className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
+                        Export CSV
+                    </button>
                 </div>
             )}
             {
@@ -489,6 +520,13 @@ const ResultsPage: React.FC = () => {
                         className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-6 py-2 mr-4 shadow transition-colors duration-200"
                     >
                         History
+                    </button>
+                    <button
+                        onClick={handleExportCSV}
+                        className="group flex items-center gap-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold rounded-xl px-6 py-3 shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    >
+                        <DocumentArrowDownIcon className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
+                        Export CSV
                     </button>
                 </div>
             }

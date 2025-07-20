@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getHistory } from "../models/history";
 import { QUERY_KEYS } from "../../../constants/queryKeys";
 import type { ResultBody, InvestigationResults } from "../types/result";
-
+import { exportResultsToCSV, exportResultsToJSON } from "../../../util/helper";
 import {
   getInvestigationResultsById,
   getInvestigationResults,
