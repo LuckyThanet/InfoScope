@@ -4137,6 +4137,7 @@
     {
       "name": "Instagram_archives",
       "uri_check": "https://archive.org/wayback/available?url=https://instagram.com/{account}/",
+      "uri_pretty": "https://instagram.com/{account}/",
       "e_code": 200,
       "e_string": "\"archived_snapshots\": {\"closest\"",
       "m_string": "\"archived_snapshots\": {}}",
