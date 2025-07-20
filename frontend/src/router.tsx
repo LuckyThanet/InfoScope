@@ -10,29 +10,23 @@ const router = createBrowserRouter(
         {
             path: "/",
             element: <HomePage />,
-            children: [
-                {
-                    path: ":id",
-                    element: <ResultsPage />,
-                }
-            ]
-        },
-        {
-            path: "/testPage",
-            element: <TestPage />,
-            errorElement: "",
         },
         {
             path: "/history",
             element: <HistoryPage />,
         },
-        // {
-        //     path: '/results',
-        //     element: <ResultsPage />,
-        // },
         {
-            path: "/testDatagrid",
-            element: <TestDatagrid />,
+            path: "/results",
+            children: [
+                {
+                    index: true,
+                    element: <ResultsPage />,
+                },
+                {
+                    path: ":requestNo",
+                    element: <ResultsPage />,
+                },
+            ]
         }
     ]
 )

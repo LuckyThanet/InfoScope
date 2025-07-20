@@ -11,14 +11,20 @@ import type { ColDef } from 'ag-grid-community';
 import { useFetchAllHistory } from '../services/api/hooks/useHistory';
 import type { HistoryEntry } from '../services/api/types/history'
 import dayjs from 'dayjs';
+import axios from 'axios'; // เพิ่ม axios import
+import { useNavigate } from 'react-router-dom';
 
 const HistoryPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [deletingCaseId, setDeletingCaseId] = useState<string | null>(null); // เพิ่ม loading state
     const itemsPerPage = 10;
 
     // Debounce search term
+
+    const navigate = useNavigate();
+
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm);
@@ -28,7 +34,7 @@ const HistoryPage = () => {
         return () => clearTimeout(timer);
     }, [searchTerm]);
 
-    const { data, isLoading, error } = useFetchAllHistory({
+    const { data, isLoading, error, refetch } = useFetchAllHistory({
         rowPerPage: itemsPerPage,
         page: currentPage,
         searchName: debouncedSearchTerm // ใช้ debouncedSearchTerm แทน searchTerm
@@ -39,8 +45,6 @@ const HistoryPage = () => {
         if (!data?.cases) return [];
         return data.cases
     }, [data]);
-
-    // Filter data based on search term (now handled by API, but keeping for local filtering if needed)
 
     // Show loading state
     if (isLoading) {
@@ -65,25 +69,88 @@ const HistoryPage = () => {
         caseId: string;
         onView: (caseId: string) => void;
         onDelete: (caseId: string) => void;
+        isDeleting: boolean;
     }
 
-    const ActionsCellRenderer: React.FC<ActionsCellRendererProps> = ({ caseId, onView, onDelete }) => (
+    const ActionsCellRenderer: React.FC<ActionsCellRendererProps> = ({ caseId, onView, onDelete, isDeleting }) => (
         <div className="flex gap-2">
             <button
                 onClick={() => onView(caseId)}
                 className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors text-sm"
+                disabled={isDeleting}
             >
                 <EyeIcon className="w-4 h-4" />
                 View Details
             </button>
             <button
                 onClick={() => onDelete(caseId)}
-                className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors text-sm"
+                disabled={isDeleting}
+                className={`flex items-center gap-1 px-3 py-1 rounded-md transition-colors text-sm ${isDeleting
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-red-100 text-red-700 hover:bg-red-200'
+                    }`}
             >
-                <TrashIcon className="w-4 h-4" />
+                {isDeleting ? (
+                    <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+                        Deleting...
+                    </>
+                ) : (
+                    <>
+                        <TrashIcon className="w-4 h-4" />
+                        Delete
+                    </>
+                )}
             </button>
         </div>
     );
+
+    // ✅ แก้ไข handleDelete ให้ยิง API จริง
+    const handleDelete = async (caseId: string) => {
+        // แสดง confirmation dialog
+        const isConfirmed = window.confirm(`Are you sure you want to delete case "${caseId}"? This action cannot be undone.`);
+
+        if (!isConfirmed) return;
+
+        try {
+            setDeletingCaseId(caseId); // แสดง loading state
+
+            // ยิง API delete
+            const response = await axios.delete('http://localhost:3000/api/delete', {
+                data: {
+                    case_id: caseId
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            console.log('Delete response:', response.data);
+
+            // แสดงข้อความสำเร็จ
+            alert('Case deleted successfully!');
+
+            // Refresh ข้อมูลหลังจากลบสำเร็จ
+            await refetch();
+
+        } catch (error: any) {
+            console.error('Error deleting case:', error);
+
+            // แสดง error message
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to delete case.';
+            alert(`Failed to delete case: ${errorMessage}`);
+
+        } finally {
+            setDeletingCaseId(null); // ซ่อน loading state
+        }
+    };
+
+    function handleViewDetails(caseId: string) {
+        console.log('View details for:', caseId);
+        // TODO: Navigate to results page หรือแสดง modal
+        navigate(`/results/${caseId}`);
+
+    }
 
     // AG Grid columns
     const columnDefs: ColDef<HistoryEntry>[] = [
@@ -105,27 +172,19 @@ const HistoryPage = () => {
         },
         {
             headerName: 'Actions',
-            minWidth: 100,
+            minWidth: 300,
             cellRenderer: (params: import('ag-grid-community').ICellRendererParams) => {
-                // Render the React component using React.createElement
                 return (
                     <ActionsCellRenderer
-                        caseId={params.data.caseId}
+                        caseId={params.data.case_id} // ✅ แก้เป็น case_id
                         onView={handleViewDetails}
                         onDelete={handleDelete}
+                        isDeleting={deletingCaseId === params.data.case_id}
                     />
                 );
             }
         }
     ];
-
-    function handleViewDetails(caseId: string) {
-        console.log('View details for:', caseId);
-    }
-
-    function handleDelete(caseId: string) {
-        console.log('Delete case:', caseId);
-    }
 
     return (
         <div className="min-h-screen bg-white">
@@ -147,7 +206,6 @@ const HistoryPage = () => {
                             value={searchTerm}
                             onChange={(e) => {
                                 setSearchTerm(e.target.value);
-                                // ลบ setCurrentPage(1) ออกจากตรงนี้เพราะจะจัดการใน useEffect แล้ว
                             }}
                             placeholder="Search by Case Name..."
                             className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
@@ -161,7 +219,16 @@ const HistoryPage = () => {
                         <div className="text-2xl font-bold text-blue-700">{data?.count || 0}</div>
                         <div className="text-sm text-blue-600">Total Cases</div>
                     </div>
+                    <button
+                        onClick={() => navigate('/')}
+                        className="bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 p-4 rounded-lg border border-blue-200 hover:border-blue-300 hover:shadow-md transition-all duration-300"
+                    >
+                        Home Page
+                    </button>
+
+
                 </div>
+
 
                 {/* Data Table */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">

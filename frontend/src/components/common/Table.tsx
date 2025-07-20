@@ -13,9 +13,11 @@ function Table<T>({ rowData, columnDefs }: TableProps<T>) {
             <AgGridReact<T>
                 rowData={rowData}
                 columnDefs={columnDefs}
-                pagination={true}
+                pagination={false}
                 paginationPageSize={10}
                 paginationPageSizeSelector={false}
+                // domLayout="autoHeight" // ✅ ปรับความสูงอัตโนมัติ
+
             />
         </div>
     );
