@@ -22,8 +22,6 @@ const HistoryPage = () => {
     const itemsPerPage = 10;
 
     // Debounce search term
-    const test: string = 'test';
-    console.log(test);
     const navigate = useNavigate();
 
     useEffect(() => {
