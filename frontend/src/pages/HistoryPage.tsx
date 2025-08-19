@@ -21,6 +21,7 @@ const HistoryPage = () => {
     const [deletingCaseId, setDeletingCaseId] = useState<string | null>(null); // เพิ่ม loading state
     const itemsPerPage = 10;
     const test = 10;
+    const [eiei, setEiei] = useState(''); // unused variable as per your request    
     // Debounce search term
     const navigate = useNavigate();
 
