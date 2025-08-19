@@ -20,7 +20,7 @@ const HistoryPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [deletingCaseId, setDeletingCaseId] = useState<string | null>(null); // เพิ่ม loading state
     const itemsPerPage = 10;
-
+    const test = 10;
     // Debounce search term
     const navigate = useNavigate();
 
