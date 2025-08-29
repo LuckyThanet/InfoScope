@@ -24,7 +24,6 @@ const HistoryPage = () => {
     const [eiei, setEiei] = useState(''); // unused variable as per your request    
     // Debounce search term
     const navigate = useNavigate();
-
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm);
